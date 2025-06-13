@@ -38,7 +38,7 @@ This project provides a Model Context Protocol (MCP) server for interacting with
 To run the application as an MCP server:
 
 ```bash
-npx github:varlabz/youtube-mcp --mcp
+npx -y github:varlabz/youtube-mcp --mcp
 ```
 
 The server will start and listen for MCP requests on standard input/output.
@@ -57,7 +57,7 @@ The server will start and listen for MCP requests on standard input/output.
 To fetch a YouTube video transcript directly from the command line:
 
 ```bash
-npx github:varlabz/youtube-mcp <YouTube_URL> [options]
+npx -y github:varlabz/youtube-mcp <YouTube_URL> [options]
 ```
 
 **Arguments:**
