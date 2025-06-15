@@ -146,6 +146,9 @@ Example:
         addVideoInfo: true,
       });
       const docs = await loader.load();
+      console.log(docs[0].metadata.title);
+      console.log(docs[0].metadata.description);
+      console.log('Transcript:');
       console.log(docs[0].pageContent);
     } catch (error) {
       console.error('Error loading transcript:', error);
