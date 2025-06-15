@@ -2,9 +2,9 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ErrorCode, ListToolsRequestSchema, McpError, } from '@modelcontextprotocol/sdk/types.js';
-import { YoutubeLoader } from '@langchain/community/document_loaders/web/youtube';
 import minimist from 'minimist';
 import pkg from '../package.json' with { type: 'json' };
+import { YoutubeLoader } from './youtubeloader.js'; // Adjust the import path as necessary
 class YoutubeMcpServer {
     constructor() {
         this.server = new Server({

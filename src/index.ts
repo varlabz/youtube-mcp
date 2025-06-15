@@ -7,9 +7,9 @@ import {
   ListToolsRequestSchema,
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
-import { YoutubeLoader } from '@langchain/community/document_loaders/web/youtube';
 import minimist from 'minimist';
 import pkg from '../package.json' with { type: 'json' };
+import { YoutubeLoader } from './youtubeloader.js'; // Adjust the import path as necessary
 
 class YoutubeMcpServer {
   private server: Server;
