@@ -109,8 +109,7 @@ Example:
     else {
         const url = args._[0];
         if (!url) {
-            console.error('Please provide a YouTube URL as an argument or use --help for more information.');
-            console.log(helpMessage); // Show help if no URL and not MCP mode
+            console.error('Provide a YouTube URL as an argument or use --help for more information.');
             process.exit(1);
         }
         const language = args.language;
