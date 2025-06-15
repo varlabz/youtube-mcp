@@ -104,6 +104,9 @@ async function main() {
   });
 
   const helpMessage = `
+${pkg.name}: ${pkg.version}
+${pkg.description}
+
 Usage: youtube-mcp [options] [YouTube URL]
 
 Options:

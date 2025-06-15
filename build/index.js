@@ -82,6 +82,9 @@ async function main() {
         default: { language: 'en' },
     });
     const helpMessage = `
+${pkg.name}: ${pkg.version}
+${pkg.description}
+
 Usage: youtube-mcp [options] [YouTube URL]
 
 Options:
