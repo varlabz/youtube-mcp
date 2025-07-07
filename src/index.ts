@@ -60,17 +60,25 @@ class YoutubeMcpServer {
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       if (request.params.name === 'load_video_transcript') {
         const { url, language = 'en' } = request.params.arguments as any;
-        const loader = YoutubeLoader.createFromUrl(url, {
-          language,
-          addVideoInfo: true
-        });
-        const docs = await loader.load();
-        return {
-          content: [{
-            type: 'text',
-            text: docs[0].pageContent,
-          }]
-        };
+        const originalConsoleWarn = console.warn;
+        const originalConsoleError = console.error;
+        console.warn = console.error = () => {};
+        try {
+          const loader = YoutubeLoader.createFromUrl(url, {
+            language,
+            addVideoInfo: true
+          });
+          const docs = await loader.load();
+          return {
+            content: [{
+              type: 'text',
+              text: docs[0].pageContent,
+            }]
+          };
+        } finally {
+          console.warn = originalConsoleWarn;
+          console.error = originalConsoleError;
+        }
       }
 
       throw new McpError(
