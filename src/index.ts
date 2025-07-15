@@ -1,96 +1,62 @@
 #!/usr/bin/env node
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  CallToolRequestSchema,
-  ErrorCode,
-  ListToolsRequestSchema,
-  McpError,
-} from '@modelcontextprotocol/sdk/types.js';
+import { z } from 'zod';
 import minimist from 'minimist';
 import pkg from '../package.json' with { type: 'json' };
 import { YoutubeLoader } from './youtubeloader.js'; // Adjust the import path as necessary
 
 class YoutubeMcpServer {
-  private server: Server;
+  private server: McpServer;
 
   constructor() {
-    this.server = new Server(
-      {
-        name: pkg.name,
-        version: pkg.version,
-      },
-      {
-        capabilities: {
-          resources: {},
-          tools: {},
-        },
-      }
-    );
+    this.server = new McpServer({
+      name: pkg.name,
+      version: pkg.version,
+    });
 
     this.setupToolHandlers();
     this.setupErrorHandlers();
   }
 
   private setupToolHandlers() {
-    this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
-      tools: [
-        {
-          name: 'load_video_transcript',
-          description: 'Load transcript from YouTube URL. example: https://www.youtube.com/watch?v=VIDEO_ID',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              url: {
-                type: 'string',
-                description: 'YouTube video URL'
-              },
-              language: {
-                type: 'string',
-                description: 'Language code for transcript',
-                default: 'en'
-              }
-            },
-            required: ['url']
-          }
-        }
-      ]
-    }));
-
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      if (request.params.name === 'load_video_transcript') {
-        const { url, language = 'en' } = request.params.arguments as any;
-        const originalConsoleWarn = console.warn;
-        const originalConsoleError = console.error;
-        console.warn = console.error = () => {};
+    this.server.tool(
+      'load_video_transcript',
+      'Load transcript from YouTube URL. example: https://www.youtube.com/watch?v=VIDEO_ID',
+      {
+        url: z.string().describe('YouTube video URL'),
+        language: z.string().describe('Language code for transcript').default('en'),
+      },
+      async ({ url, language }: { url: string; language: string }) => {
         try {
           const loader = YoutubeLoader.createFromUrl(url, {
             language,
-            addVideoInfo: true
+            addVideoInfo: true,
           });
           const docs = await loader.load();
           return {
-            content: [{
-              type: 'text',
-              text: docs[0].pageContent,
-            }]
+            content: [
+              {
+                type: 'text',
+                text: docs[0].pageContent,
+              },
+            ],
           };
-        } finally {
-          console.warn = originalConsoleWarn;
-          console.error = originalConsoleError;
+        } catch (error) {
+          throw new Error(`Failed to load transcript: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
-
-      throw new McpError(
-        ErrorCode.MethodNotFound,
-        `Unknown tool: ${request.params.name}`
-      );
-    });
+    );
   }
 
   private setupErrorHandlers() {
-    this.server.onerror = (error) => console.error('[MCP Error]', error);
+    // Handle process termination gracefully
     process.on('SIGINT', async () => {
+      await this.server.close();
+      process.exit(0);
+    });
+
+    process.on('SIGTERM', async () => {
       await this.server.close();
       process.exit(0);
     });
@@ -144,10 +110,7 @@ Example:
       process.exit(1);
     }
     const language = args.language;
-    const originalConsoleWarn = console.warn;
-    const originalConsoleError = console.error;
-    // Temporarily silence console output
-    console.warn = console.error = () => {};
+    
     try {
       const loader = YoutubeLoader.createFromUrl(url, {
         language,
@@ -159,11 +122,8 @@ Example:
       console.log('Transcript:');
       console.log(docs[0].pageContent);
     } catch (error) {
-      console.error('Error loading transcript:', error);
+      console.error('Error loading transcript:', error instanceof Error ? error.message : String(error));
       process.exit(1);
-    } finally {
-      console.warn = originalConsoleWarn;
-      console.error = originalConsoleError;
     }
   }
 }

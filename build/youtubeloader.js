@@ -55,6 +55,9 @@ export class YoutubeLoader {
         const metadata = {
             source: this.videoId,
         };
+        const originalConsoleWarn = console.warn;
+        const originalConsoleError = console.error;
+        console.warn = console.error = () => { };
         try {
             const youtube = await Innertube.create({
                 lang: this.language,
@@ -79,6 +82,10 @@ export class YoutubeLoader {
         }
         catch (e) {
             throw new Error(`Failed to get YouTube video transcription: ${e.message}`);
+        }
+        finally {
+            console.warn = originalConsoleWarn;
+            console.error = originalConsoleError;
         }
         const document = {
             pageContent: transcript,
