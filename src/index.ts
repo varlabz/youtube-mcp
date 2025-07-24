@@ -71,7 +71,13 @@ class YoutubeMcpServer {
 
 async function main() {
   const args = minimist(process.argv.slice(2), {
-    alias: { h: 'help', l: 'language' },
+    alias: {
+      h: 'help',
+      l: 'language',
+      t: 'title',
+      d: 'description',
+      s: 'transcript',
+    },
     boolean: ['mcp', 'help', 'title', 'description', 'transcript'],
     string: ['language'],
     default: { language: 'en' },
@@ -84,12 +90,12 @@ ${pkg.description}
 Usage: youtube-mcp [options] [YouTube URL]
 
 Options:
-  --mcp                   Run as MCP server.
-  -l, --language CODE     Language code for transcript (default: "en").
-  --title                 Show video title.
-  --description           Show video description.
-  --transcript            Show transcript.
-  -h, --help              Display this help message.
+  --mcp                      Run as MCP server.
+  -l, --language CODE        Language code for transcript (default: "en").
+  -t, --title                Show video title.
+  -d, --description          Show video description.
+  -s, --transcript           Show transcript.
+  -h, --help                 Display this help message.
 
 If none of --title, --description, or --transcript are provided, all are shown by default.
 If any of these are provided, only the specified ones are shown.
@@ -98,7 +104,7 @@ If not in MCP mode, a YouTube URL is required as an argument.
 Example:
   youtube-mcp https://www.youtube.com/watch?v=dQw4w9WgXcQ
   youtube-mcp --mcp
-  youtube-mcp -l fr --title --transcript https://www.youtube.com/watch?v=dQw4w9WgXcQ
+  youtube-mcp -l fr -t -s https://www.youtube.com/watch?v=dQw4w9WgXcQ
 `;
 
   if (args.help) {
