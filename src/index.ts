@@ -72,7 +72,7 @@ class YoutubeMcpServer {
 async function main() {
   const args = minimist(process.argv.slice(2), {
     alias: { h: 'help', l: 'language' },
-    boolean: ['mcp', 'help'],
+    boolean: ['mcp', 'help', 'title', 'description', 'transcript'],
     string: ['language'],
     default: { language: 'en' },
   });
@@ -84,15 +84,21 @@ ${pkg.description}
 Usage: youtube-mcp [options] [YouTube URL]
 
 Options:
-  --mcp                Run as MCP server.
-  -l, --language CODE  Language code for transcript (default: "en").
-  -h, --help           Display this help message.
+  --mcp                   Run as MCP server.
+  -l, --language CODE     Language code for transcript (default: "en").
+  --title                 Show video title.
+  --description           Show video description.
+  --transcript            Show transcript.
+  -h, --help              Display this help message.
+
+If none of --title, --description, or --transcript are provided, all are shown by default.
+If any of these are provided, only the specified ones are shown.
 
 If not in MCP mode, a YouTube URL is required as an argument.
 Example:
   youtube-mcp https://www.youtube.com/watch?v=dQw4w9WgXcQ
   youtube-mcp --mcp
-  youtube-mcp -l fr https://www.youtube.com/watch?v=dQw4w9WgXcQ
+  youtube-mcp -l fr --title --transcript https://www.youtube.com/watch?v=dQw4w9WgXcQ
 `;
 
   if (args.help) {
@@ -110,17 +116,29 @@ Example:
       process.exit(1);
     }
     const language = args.language;
-    
+    // If none of the three are specified, show all. If any are specified, only show those.
+    const anySpecified = args.title || args.description || args.transcript;
+    const showTitle = anySpecified ? !!args.title : true;
+    const showDescription = anySpecified ? !!args.description : true;
+    const showTranscript = anySpecified ? !!args.transcript : true;
+
     try {
       const loader = YoutubeLoader.createFromUrl(url, {
         language,
         addVideoInfo: true,
       });
       const docs = await loader.load();
-      console.log(docs[0].metadata.title);
-      console.log(docs[0].metadata.description);
-      console.log('Transcript:');
-      console.log(docs[0].pageContent);
+      if (showTitle) {
+        console.log(docs[0].metadata.title);
+      }
+      if (showDescription) {
+        console.log(docs[0].metadata.description);
+      }
+      if (showTranscript) {
+        console.log('');
+        console.log('Transcript:');
+        console.log(docs[0].pageContent);
+      }
     } catch (error) {
       console.error('Error loading transcript:', error instanceof Error ? error.message : String(error));
       process.exit(1);

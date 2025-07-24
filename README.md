@@ -67,16 +67,27 @@ npx -y github:varlabz/youtube-mcp <YouTube_URL> [options]
 **Options:**
 
 -   `-l, --language <CODE>`: Specify the language code for the transcript (e.g., `en`, `fr`). Defaults to `en`.
+-   `--title`: Show the video title.
+-   `--description`: Show the video description.
+-   `--transcript`: Show the transcript.
 -   `-h, --help`: Display the help message.
+
+> If none of `--title`, `--description`, or `--transcript` are provided, all are shown by default. If any of these are provided, only the specified ones are shown.
 
 **Examples:**
 
 ```bash
-# Fetch transcript in English (default)
+# Show all (default)
 npx github:varlabz/youtube-mcp https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
-# Fetch transcript in French
-npx github:varlabz/youtube-mcp https://www.youtube.com/watch?v=dQw4w9WgXcQ -l fr
+# Fetch transcript in French, only show transcript
+npx github:varlabz/youtube-mcp https://www.youtube.com/watch?v=dQw4w9WgXcQ -l fr --transcript
+
+# Show only title and description (no transcript)
+npx github:varlabz/youtube-mcp https://www.youtube.com/watch?v=dQw4w9WgXcQ --title --description
+
+# Show only the title
+npx github:varlabz/youtube-mcp https://www.youtube.com/watch?v=dQw4w9WgXcQ --title
 ```
 
 ## Development
