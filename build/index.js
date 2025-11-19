@@ -4,7 +4,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import minimist from 'minimist';
 import pkg from '../package.json' with { type: 'json' };
-import { YoutubeLoader } from './youtubeloader.js'; // Adjust the import path as necessary
+import { YoutubeLoader } from './youtubeloader.js';
 class YoutubeMcpServer {
     constructor() {
         this.server = new McpServer({
@@ -25,11 +25,12 @@ class YoutubeMcpServer {
                     addVideoInfo: true,
                 });
                 const docs = await loader.load();
+                const doc = docs[0];
                 return {
                     content: [
                         {
                             type: 'text',
-                            text: docs[0].pageContent,
+                            text: `<title>\n${doc.metadata.title}\n</title>\n\n<description>\n${doc.metadata.description}\n</description>\n\n<transcript>\n${doc.pageContent}\n</transcript>`,
                         },
                     ],
                 };
@@ -119,15 +120,13 @@ Example:
             });
             const docs = await loader.load();
             if (showTitle) {
-                console.log(docs[0].metadata.title);
+                console.log(`<title>\n${docs[0].metadata.title}\n</title>`);
             }
             if (showDescription) {
-                console.log(docs[0].metadata.description);
+                console.log(`<description>\n${docs[0].metadata.description}\n</description>`);
             }
             if (showTranscript) {
-                console.log('');
-                console.log('Transcript:');
-                console.log(docs[0].pageContent);
+                console.log(`<transcript>\n${docs[0].pageContent}\n</transcript>`);
             }
         }
         catch (error) {

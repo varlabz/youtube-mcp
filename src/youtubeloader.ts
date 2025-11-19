@@ -35,10 +35,9 @@ interface VideoMetadata {
  * youtubei.js library to fetch the transcript and video metadata.
  * @example
  * ```typescript
- * const loader = new YoutubeLoader(
- *   "https:
- *   "en",
- *   true,
+ * const loader = YoutubeLoader.createFromUrl(
+ *   "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+ *   { language: "en", addVideoInfo: true }
  * );
  * const docs = await loader.load();
  * ```
